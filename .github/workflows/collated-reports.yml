@@ -1,21 +1,7 @@
 name: CI collated reports
 
 on:
-  workflow_call:
-    inputs:
-      job:
-        required: true
-        type: string
-      report_repo_id:
-        required: true
-        type: string
-      machine_type:
-        required: true
-        type: string
-      gpu_name:
-        description: Name of the GPU used for the job. Its enough that the value contains the name of the GPU, e.g. "noise-h100-more-noise". Case insensitive.
-        required: true
-        type: string
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 
 permissions: {}

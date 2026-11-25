@@ -1,12 +1,7 @@
 name: SGLang Integration Tests
 
 on:
-  schedule:
-    - cron: "0 3 * * *"
-  workflow_dispatch:
-  push:
-    branches:
-      - sglang_ci*
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   SGLANG_USE_CPU_ENGINE: "1"

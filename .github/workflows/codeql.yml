@@ -2,11 +2,7 @@
 name: CodeQL Security Analysis
 
 on:
-  push:
-    branches: ["main", "fix_security_issue_*"]
-  # pull_request:
-  #   branches: ["main"]
-  workflow_dispatch:
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

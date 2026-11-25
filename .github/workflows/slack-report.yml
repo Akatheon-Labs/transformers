@@ -1,36 +1,7 @@
 name: CI slack report
 
 on:
-  workflow_call:
-    inputs:
-      job:
-        required: true
-        type: string
-      slack_report_channel:
-        required: true
-        type: string
-      setup_status:
-        required: true
-        type: string
-      folder_slices:
-        required: true
-        type: string
-      quantization_matrix:
-        required: true
-        type: string
-      ci_event:
-        required: true
-        type: string
-      report_repo_id:
-        required: true
-        type: string
-      commit_sha:
-        required: false
-        type: string
-    outputs:
-      is_slack_reporting_job_ok:
-        description: "Whether the send_results job succeeded (not failed)"
-        value: ${{ jobs.send_results.result != 'failure' }}
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   TRANSFORMERS_CI_RESULTS_UPLOAD_TOKEN: ${{ secrets.TRANSFORMERS_CI_RESULTS_UPLOAD_TOKEN }}

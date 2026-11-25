@@ -1,0 +1,7 @@
+# Files left out of every showcase job
+tests/models/csm/test_processing_csm.py  # class setup needs the Hub; an unexpanded item then ends the xdist worker
+tests/models/cosmos3_edge/test_processing_cosmos3_edge.py  # class setup needs the Hub; an unexpanded item then ends the xdist worker
+tests/models/code_llama/test_tokenization_code_llama.py  # class setup needs the Hub (every test of the class errors at setup)
+tests/models/colmodernvbert/test_processing_colmodernvbert.py  # class setup needs the Hub; an unexpanded item then ends the xdist worker
+tests/models/cohere_compass/test_processing_cohere_compass.py  # class setup needs the Hub
+tests/models/bertweet/test_tokenization_bertweet.py  # class setup fails at the base commit with no change (TypeError: a vocabulary path is None offline)

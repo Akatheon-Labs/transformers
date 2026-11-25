@@ -1,9 +1,7 @@
 name: Build docker images (Past CI)
 
 on:
-  push:
-    branches:
-      - build_past_ci_docker_image*
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 concurrency:
   group: docker-images-builds

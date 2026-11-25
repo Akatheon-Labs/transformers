@@ -1,12 +1,7 @@
 name: Doctests
 
 on:
-  push:
-    branches:
-      - run_doctest*
-  repository_dispatch:
-  schedule:
-    - cron: "17 2 * * *"
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   NUM_SLICES: 3

@@ -2,8 +2,7 @@ name: Anti-Slop
 
 
 on:
-  pull_request_target:
-    types: [opened, reopened]
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions: {}
 

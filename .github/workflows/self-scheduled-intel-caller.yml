@@ -1,8 +1,7 @@
 name: Self-hosted runner (Intel scheduled CI caller)
 
 on:
-  schedule:
-    - cron: "17 5 * * *"
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 
 permissions: {}

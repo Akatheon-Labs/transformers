@@ -1,11 +1,7 @@
 name: PR comment GitHub CI
 
 on:
-  issue_comment:
-    types:
-      - created
-    branches-ignore:
-      - main
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.issue.number }}-${{ startsWith(github.event.comment.body, 'run-slow') || startsWith(github.event.comment.body, 'run slow') || startsWith(github.event.comment.body, 'run_slow') }}
   cancel-in-progress: true

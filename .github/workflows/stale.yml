@@ -1,8 +1,7 @@
 name: Stale Bot
 
 on:
-  schedule:
-    - cron: "0 8 * * *"
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

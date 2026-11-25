@@ -2,19 +2,7 @@ name: Self-hosted runner (past-ci)
 
 
 on:
-  workflow_call:
-    inputs:
-      framework:
-        required: true
-        type: string
-      version:
-        required: true
-        type: string
-      # Use this to control the commit to test against
-      sha:
-        default: 'main'
-        required: false
-        type: string
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

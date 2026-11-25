@@ -8,8 +8,7 @@ name: Docs check trigger
 # seconds after a push, the run can still point to the commit before it.
 
 on:
-  pull_request_review:
-    types: [submitted]
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions: {}
 

@@ -27,7 +27,7 @@ jobs:
 
     - name: Install requirements
       run: |
-        pip install PyGithub
+        pip install "PyGithub>=2.1"
     - name: Close stale issues
       run: |
         python scripts/stale.py

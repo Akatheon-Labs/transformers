@@ -1,5 +1,5 @@
 on:
-  push:
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 name: Secret Leaks
 

@@ -1,14 +1,7 @@
 name: Doctest job
 
 on:
-  workflow_call:
-    inputs:
-      job_splits:
-        required: true
-        type: string
-      split_keys:
-        required: true
-        type: string
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   HF_HOME: /mnt/cache

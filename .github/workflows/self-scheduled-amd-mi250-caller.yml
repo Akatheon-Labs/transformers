@@ -1,13 +1,7 @@
 name: Self-hosted runner (AMD mi250 scheduled CI caller)
 
 on:
-  workflow_run:
-    workflows: ["Self-hosted runner (AMD scheduled CI caller)"]
-    branches: ["main"]
-    types: [completed]
-  push:
-    branches:
-      - run_amd_scheduled_ci_caller*
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

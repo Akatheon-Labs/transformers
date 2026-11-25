@@ -15,12 +15,7 @@ name: Docs check
 # The status doesn't block merging. None of the jobs runs code from the PR.
 
 on:
-  workflow_run:
-    workflows: ["Docs check trigger"]
-    types: [completed]
-  pull_request_target:
-    branches: [main]
-    types: [opened, reopened, synchronize]
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions: {}
 

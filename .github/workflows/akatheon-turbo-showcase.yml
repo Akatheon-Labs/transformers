@@ -1,0 +1,237 @@
+# Akatheon Turbo showcase on a fork of Hugging Face transformers: the CPU core slice (BERT, GPT-2, Llama, T5, the
+# tokenizers, the trainer and the configuration utilities), run four ways on every demo pull request:
+#   full      the whole slice, as CI runs it today (the baseline: wall clock in the job summary)
+#   enforce   Akatheon Turbo runs only the tests its certificates select (the pull request's real job)
+#   shadow    Akatheon Turbo runs the whole slice and counts the failures its selection would have missed
+#   testmon   pytest-testmon, on the planted-bug pull request only (its database built on the base below)
+# On the base branch (push, or by hand): Akatheon Turbo records the certificates, and testmon builds its database.
+# Every job is offline: the Hugging Face files these tests read come from this fork's release, never the Hub.
+name: akatheon-turbo-showcase
+on:
+  push:
+    branches: [akatheon-showcase]
+  pull_request:
+    branches: [akatheon-showcase]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: akatheon-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  HF_HUB_OFFLINE: "1"
+  HF_ASSETS_URL: https://github.com/akatheon-labs/transformers/releases/download/showcase-hf-assets-v1/hf-assets.tar.gz.enc
+  HF_ASSETS_SHA256: 74140a4686f23431f9b0d58504e373e14874c08fe491587e9b8ddda75a894746
+  SLICE: tests/tokenization tests/utils/test_configuration_utils.py tests/trainer tests/models/bert tests/models/gpt2 tests/models/llama tests/models/t5
+  DESELECT: __DESELECT__
+  TEST_CMD: .venv/bin/python -m pytest -p no:cacheprovider -p no:testmon -n 4 --dist loadfile __DESELECT__ tests/tokenization tests/utils/test_configuration_utils.py tests/trainer tests/models/bert tests/models/gpt2 tests/models/llama tests/models/t5
+jobs:
+  certificates:
+    name: Akatheon Turbo certificates (base branch)
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install (Python 3.12, CPU torch, the pinned test environment, transformers from this checkout)
+        run: |
+          uv venv -q --python 3.12 .venv
+          uv pip install -q --python .venv/bin/python -r .github/akatheon-showcase/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match
+          uv pip install -q --python .venv/bin/python --no-deps -e .
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - name: Hugging Face files for the offline tests (this fork's release, never the Hub)
+        env:
+          HF_ASSETS_KEY: ${{ secrets.HF_ASSETS_KEY }}
+        run: |
+          curl -sSfL --retry 3 -o "$RUNNER_TEMP/hf.enc" "$HF_ASSETS_URL"
+          echo "$HF_ASSETS_SHA256  $RUNNER_TEMP/hf.enc" | sha256sum -c -
+          mkdir -p ~/.cache/huggingface
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:HF_ASSETS_KEY -in "$RUNNER_TEMP/hf.enc" | tar -xz -C ~/.cache/huggingface
+          rm "$RUNNER_TEMP/hf.enc"
+      - uses: akatheon/turbo@v1
+        with:
+          mode: refresh
+          command: ${{ env.TEST_CMD }}
+  testmon-database:
+    name: pytest-testmon database (base branch)
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install (Python 3.12, CPU torch, the pinned test environment, transformers from this checkout)
+        run: |
+          uv venv -q --python 3.12 .venv
+          uv pip install -q --python .venv/bin/python -r .github/akatheon-showcase/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match
+          uv pip install -q --python .venv/bin/python --no-deps -e .
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - name: Hugging Face files for the offline tests (this fork's release, never the Hub)
+        env:
+          HF_ASSETS_KEY: ${{ secrets.HF_ASSETS_KEY }}
+        run: |
+          curl -sSfL --retry 3 -o "$RUNNER_TEMP/hf.enc" "$HF_ASSETS_URL"
+          echo "$HF_ASSETS_SHA256  $RUNNER_TEMP/hf.enc" | sha256sum -c -
+          mkdir -p ~/.cache/huggingface
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:HF_ASSETS_KEY -in "$RUNNER_TEMP/hf.enc" | tar -xz -C ~/.cache/huggingface
+          rm "$RUNNER_TEMP/hf.enc"
+      - name: testmon's database, from one full run of the slice
+        run: |
+          mkdir -p "$RUNNER_TEMP/testmon"
+          set +e
+          TESTMON_DATAFILE="$RUNNER_TEMP/testmon/testmondata" .venv/bin/python -m pytest -p no:cacheprovider --testmon -n 4 --dist loadfile $DESELECT $SLICE -q
+          echo "full run with --testmon: exit $?"
+          ls -la "$RUNNER_TEMP/testmon"
+      - uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/testmon
+          key: testmon-${{ github.sha }}
+  full:
+    name: Baseline full suite
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install (Python 3.12, CPU torch, the pinned test environment, transformers from this checkout)
+        run: |
+          uv venv -q --python 3.12 .venv
+          uv pip install -q --python .venv/bin/python -r .github/akatheon-showcase/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match
+          uv pip install -q --python .venv/bin/python --no-deps -e .
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - name: Hugging Face files for the offline tests (this fork's release, never the Hub)
+        env:
+          HF_ASSETS_KEY: ${{ secrets.HF_ASSETS_KEY }}
+        run: |
+          curl -sSfL --retry 3 -o "$RUNNER_TEMP/hf.enc" "$HF_ASSETS_URL"
+          echo "$HF_ASSETS_SHA256  $RUNNER_TEMP/hf.enc" | sha256sum -c -
+          mkdir -p ~/.cache/huggingface
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:HF_ASSETS_KEY -in "$RUNNER_TEMP/hf.enc" | tar -xz -C ~/.cache/huggingface
+          rm "$RUNNER_TEMP/hf.enc"
+      - name: The full suite (as CI runs it today)
+        run: |
+          s=$(date +%s)
+          set +e; $TEST_CMD --junitxml="$RUNNER_TEMP/full.xml"; rc=$?; set -e
+          t=$(( $(date +%s) - s ))
+          read n f < <(python3 -c "import sys, xml.etree.ElementTree as E; r=E.parse(sys.argv[1]).getroot(); s=r if r.tag=='testsuite' else r[0]; print(int(s.get('tests')) - int(s.get('skipped', 0)), int(s.get('failures', 0)) + int(s.get('errors', 0)))" "$RUNNER_TEMP/full.xml")
+          { echo "### Baseline: the full suite"; echo; echo "| tests run | failed | wall clock | exit |"; echo "|---|---|---|---|"; echo "| $n | $f | $((t / 60)) min $((t % 60)) s | $rc |"; } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+  shadow:
+    name: Akatheon Turbo shadow (whole suite, counts what the selection would miss)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install (Python 3.12, CPU torch, the pinned test environment, transformers from this checkout)
+        run: |
+          uv venv -q --python 3.12 .venv
+          uv pip install -q --python .venv/bin/python -r .github/akatheon-showcase/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match
+          uv pip install -q --python .venv/bin/python --no-deps -e .
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - name: Hugging Face files for the offline tests (this fork's release, never the Hub)
+        env:
+          HF_ASSETS_KEY: ${{ secrets.HF_ASSETS_KEY }}
+        run: |
+          curl -sSfL --retry 3 -o "$RUNNER_TEMP/hf.enc" "$HF_ASSETS_URL"
+          echo "$HF_ASSETS_SHA256  $RUNNER_TEMP/hf.enc" | sha256sum -c -
+          mkdir -p ~/.cache/huggingface
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:HF_ASSETS_KEY -in "$RUNNER_TEMP/hf.enc" | tar -xz -C ~/.cache/huggingface
+          rm "$RUNNER_TEMP/hf.enc"
+      - uses: akatheon/turbo@v1
+        with:
+          mode: shadow
+          command: ${{ env.TEST_CMD }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: receipt-shadow
+          path: .akatheon-ci/receipt/
+          include-hidden-files: true  # the receipt sits under .akatheon-ci/; the signing key is outside it
+  enforce:
+    name: Akatheon Turbo (selected tests only)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install (Python 3.12, CPU torch, the pinned test environment, transformers from this checkout)
+        run: |
+          uv venv -q --python 3.12 .venv
+          uv pip install -q --python .venv/bin/python -r .github/akatheon-showcase/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match
+          uv pip install -q --python .venv/bin/python --no-deps -e .
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - name: Hugging Face files for the offline tests (this fork's release, never the Hub)
+        env:
+          HF_ASSETS_KEY: ${{ secrets.HF_ASSETS_KEY }}
+        run: |
+          curl -sSfL --retry 3 -o "$RUNNER_TEMP/hf.enc" "$HF_ASSETS_URL"
+          echo "$HF_ASSETS_SHA256  $RUNNER_TEMP/hf.enc" | sha256sum -c -
+          mkdir -p ~/.cache/huggingface
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:HF_ASSETS_KEY -in "$RUNNER_TEMP/hf.enc" | tar -xz -C ~/.cache/huggingface
+          rm "$RUNNER_TEMP/hf.enc"
+      - uses: akatheon/turbo@v1
+        with:
+          mode: enforce
+          command: ${{ env.TEST_CMD }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: receipt-enforce
+          path: .akatheon-ci/receipt/
+          include-hidden-files: true  # the receipt sits under .akatheon-ci/; the signing key is outside it
+  testmon:
+    name: pytest-testmon (comparison)
+    if: github.event_name == 'pull_request' && github.head_ref == 'akatheon-demo/fixture-bug'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install (Python 3.12, CPU torch, the pinned test environment, transformers from this checkout)
+        run: |
+          uv venv -q --python 3.12 .venv
+          uv pip install -q --python .venv/bin/python -r .github/akatheon-showcase/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match
+          uv pip install -q --python .venv/bin/python --no-deps -e .
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - name: Hugging Face files for the offline tests (this fork's release, never the Hub)
+        env:
+          HF_ASSETS_KEY: ${{ secrets.HF_ASSETS_KEY }}
+        run: |
+          curl -sSfL --retry 3 -o "$RUNNER_TEMP/hf.enc" "$HF_ASSETS_URL"
+          echo "$HF_ASSETS_SHA256  $RUNNER_TEMP/hf.enc" | sha256sum -c -
+          mkdir -p ~/.cache/huggingface
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:HF_ASSETS_KEY -in "$RUNNER_TEMP/hf.enc" | tar -xz -C ~/.cache/huggingface
+          rm "$RUNNER_TEMP/hf.enc"
+      - uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/testmon
+          key: testmon-${{ github.event.pull_request.base.sha }}
+          fail-on-cache-miss: true
+      - name: pytest-testmon runs the tests it selects
+        run: |
+          s=$(date +%s)
+          set +e
+          TESTMON_DATAFILE="$RUNNER_TEMP/testmon/testmondata" .venv/bin/python -m pytest -p no:cacheprovider --testmon -n 4 --dist loadfile $DESELECT $SLICE -q --junitxml="$RUNNER_TEMP/tm.xml"
+          rc=$?; set -e
+          t=$(( $(date +%s) - s ))
+          read n f < <(python3 -c "import sys, xml.etree.ElementTree as E; r=E.parse(sys.argv[1]).getroot(); s=r if r.tag=='testsuite' else r[0]; print(int(s.get('tests')) - int(s.get('skipped', 0)), int(s.get('failures', 0)) + int(s.get('errors', 0)))" "$RUNNER_TEMP/tm.xml" 2>/dev/null || echo "0 0")
+          { echo "### pytest-testmon"; echo; echo "| tests run | failed | wall clock | exit |"; echo "|---|---|---|---|"; echo "| $n | $f | $((t / 60)) min $((t % 60)) s | $rc |"; } >> "$GITHUB_STEP_SUMMARY"
+          [ $rc = 5 ] && exit 0  # pytest's "no tests ran": testmon selected nothing
+          exit $rc

@@ -7,28 +7,7 @@ name: Self-hosted runner scale set (Intel XPU scheduled CI caller)
 # workflows referenced at @main; a pinned SHA causes jobs to wait for a runner until the 24h timeout.
 
 on:
-  workflow_run:
-    workflows: ["Self-hosted runner (Intel scheduled CI caller)"]
-    branches: ["main"]
-    types: [completed]
-  push:
-    branches:
-      - run_intel_xpu_scheduled_ci_caller*
-  workflow_dispatch:
-    inputs:
-      prev_workflow_run_id:
-        description: 'previous workflow run id to compare'
-        type: string
-        required: false
-        default: ""
-      other_workflow_run_id:
-        description: 'other workflow run id to compare'
-        type: string
-        required: false
-        default: ""
-
-
-# Used for `push` to easily modify the target workflow runs to compare against
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 env:
     prev_workflow_run_id: ""
     other_workflow_run_id: ""

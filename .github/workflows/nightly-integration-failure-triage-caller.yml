@@ -6,18 +6,7 @@ name: Nightly integration-failure triage
 # fix task per failure group against this repo (huggingface/transformers).
 #
 on:
-  schedule:
-    - cron: "0 22 * * *"
-  # Allow manual triggers for testing. GitHub only lets users with write access
-  # to this repo run workflow_dispatch, so no extra authorization gate is needed.
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Compute the report but do not dispatch to Serge"
-        type: boolean
-        default: false
-
-# Permissions are granted here and bound the reusable workflow's job token.
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 permissions:
   # Read repo contents so the reusable workflow can check out code and read the
   # CI dataset/config; no write access to the codebase is needed.

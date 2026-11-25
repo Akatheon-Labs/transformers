@@ -13,65 +13,7 @@ name: serge verify (GPU)
 # `run-slow` on a PR, and carries only the read-only HF token.
 
 on:
-  workflow_dispatch:
-    inputs:
-      mode:
-        description: "verify (baseline+patched red→green gate) | reproduce (baseline only, confirm the failure is real before serge investigates)"
-        required: false
-        type: choice
-        options:
-          - verify
-          - reproduce
-        default: verify
-      base_sha:
-        description: "Pre-patch commit — targeted tests MUST be red here (baseline-red guard)"
-        required: true
-        type: string
-      commit_sha:
-        description: "serge's candidate commit — targeted tests should be green here (unused when mode=reproduce)"
-        required: false
-        type: string
-        default: ""
-      test_nodeids:
-        description: "Space-separated pytest node-ids for the group"
-        required: true
-        type: string
-      model:
-        description: "Model folder for the optional collateral suite, e.g. `whisper`"
-        required: true
-        type: string
-      machine_type:
-        description: "GPU runner group"
-        required: true
-        type: choice
-        options:
-          - aws-g5-4xlarge-cache
-          - aws-g5-12xlarge-cache
-        default: aws-g5-12xlarge-cache
-      run_collateral:
-        description: "Also run the full tests/models/<model> slow suite on both trees"
-        required: false
-        type: boolean
-        default: false
-      transformersci_ref:
-        description: "Ref of transformers-ci to install the verdict tool from"
-        required: false
-        type: string
-        default: main
-      memory_probe:
-        description: "Diagnostic: record per-test device memory, including how much survives a gc.collect(), and upload it as an artifact. Off by default — the collect frees memory, so it can stop a memory-related failure from reproducing."
-        required: false
-        type: boolean
-        default: false
-      correlation_id:
-        description: "Opaque id echoed into the run name so serge can find this run"
-        required: false
-        type: string
-        default: ""
-
-# The run name embeds the correlation id: a workflow_dispatch run's head_sha is
-# the ref (not serge's candidate commit), so serge correlates the run it just
-# dispatched by matching this id in the run name rather than by sha.
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 run-name: "serge ${{ inputs.mode }} ${{ inputs.model }} ${{ inputs.machine_type }} [${{ inputs.correlation_id }}]"
 
 # Granted here and bound onto the reusable workflow's job token.

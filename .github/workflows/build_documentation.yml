@@ -1,13 +1,7 @@
 name: Build documentation
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-      - doc-builder*
-      - v*-release
-      - use_templates
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

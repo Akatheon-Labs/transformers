@@ -1,10 +1,7 @@
 name: Update Transformers metadata
 
 on:
-  push:
-    branches:
-      - main
-      - update_transformers_metadata*
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 
 permissions: {}

@@ -2,15 +2,7 @@
 name: Check Permissions Advisor
 
 on:
-  workflow_dispatch:
-    inputs:
-      workflow_name:
-        description: 'Workflow file name'
-        type: string
-      run_count:
-        description: 'Number of runs to analyze'
-        type: string
-        default: "10"
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

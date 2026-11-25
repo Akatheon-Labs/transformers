@@ -1,24 +1,7 @@
 name: model jobs
 
 on:
-  workflow_call:
-    inputs:
-      folder_slices:
-        required: true
-        type: string
-      slice_id:
-        required: true
-        type: number
-      runner:
-        required: true
-        type: string
-      machine_type:
-        required: true
-        type: string
-      report_name_prefix:
-        required: false
-        default: run_models_gpu
-        type: string
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   RUN_SLOW: yes

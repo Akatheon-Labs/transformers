@@ -1,14 +1,7 @@
 name: Build docker images (Nightly CI)
 
 on:
-  workflow_call:
-    inputs:
-      job:
-        required: true
-        type: string
-  push:
-    branches:
-      - build_nightly_ci_docker_image*
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 concurrency:
   group: docker-images-builds

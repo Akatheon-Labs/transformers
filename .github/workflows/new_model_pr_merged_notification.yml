@@ -2,11 +2,7 @@
 name: New model PR merged notification
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/transformers/models/*/modeling_*'
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 
 permissions: {}

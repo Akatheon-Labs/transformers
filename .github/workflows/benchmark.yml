@@ -2,7 +2,7 @@ name: Self-hosted runner (benchmark)
 
 # Automatic runs (push to main, labeled PRs) are disabled; trigger manually if needed.
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}

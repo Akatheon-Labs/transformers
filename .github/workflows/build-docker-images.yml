@@ -1,18 +1,7 @@
 name: Build docker images (scheduled)
 
 on:
-  push:
-    branches:
-      - build_ci_docker_image*
-  repository_dispatch:
-  workflow_dispatch:
-  workflow_call:
-    inputs:
-      image_postfix:
-        required: true
-        type: string
-  schedule:
-    - cron: "17 0 * * *"
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 concurrency:
   group: docker-images-builds

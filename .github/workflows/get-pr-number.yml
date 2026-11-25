@@ -1,10 +1,6 @@
 name: Get PR number
 on:
-  workflow_call:
-    outputs:
-      PR_NUMBER:
-        description: "The extracted PR number"
-        value: ${{ jobs.get-pr-number.outputs.PR_NUMBER }}
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 
 permissions: {}

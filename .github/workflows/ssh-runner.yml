@@ -1,18 +1,7 @@
 name: SSH into our runners
 
 on:
-  workflow_dispatch:
-    inputs:
-      runner_type:
-        description: 'Type of runner to test (a10, cpu)'
-        required: true
-      docker_image:
-        description: 'Name of the Docker image'
-        required: true
-      num_gpus:
-        description: 'Number of GPUs to use (`single` or `multi`; not needed for cpu runner)'
-        required: false
-        default: 'none'
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   HF_TOKEN: ${{ secrets.HF_HUB_READ_TOKEN }}

@@ -1,11 +1,7 @@
 name: Self-hosted runner (nightly-past-ci-caller)
 
 on:
-  schedule:
-    - cron: "17 2,14 * * *"
-  push:
-    branches:
-      - run_past_ci*
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

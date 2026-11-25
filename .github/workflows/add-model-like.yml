@@ -1,15 +1,7 @@
 name: Add model like runner
 
 on:
-  push:
-    branches:
-      - none # put main here when this is fixed
-  #pull_request:
-  #  paths:
-  #    - "src/**"
-  #    - "tests/**"
-  #    - ".github/**"
-  #  types: [opened, synchronize, reopened]
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 
 permissions: {}

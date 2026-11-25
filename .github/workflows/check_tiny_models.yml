@@ -1,12 +1,7 @@
 name: Check Tiny Models
 
 on:
-  push:
-    branches:
-      - check_tiny_models*
-  repository_dispatch:
-  schedule:
-    - cron: "0 2 * * *"
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   TOKEN: ${{ secrets.TRANSFORMERS_HUB_BOT_HF_TOKEN }}

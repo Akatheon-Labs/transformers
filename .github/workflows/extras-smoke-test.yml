@@ -1,9 +1,7 @@
 name: Extras Smoke Test
 
 on:
-  schedule:
-    # Run every night at 3 AM UTC
-    - cron: "0 3 * * *"
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 env:
   SLACK_CHANNEL_ID: '#transformers-gh-ci-central'
 

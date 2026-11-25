@@ -1,27 +1,7 @@
 name: Nvidia CI - Flash Attn
 
 on:
-  repository_dispatch:
-  schedule:
-    - cron: "17 2 * * *"
-  push:
-    branches:
-      - run_nvidia_ci_flash_attn*
-  workflow_dispatch:
-    inputs:
-      prev_workflow_run_id:
-        description: 'previous workflow run id to compare'
-        type: string
-        required: false
-        default: ""
-      other_workflow_run_id:
-        description: 'other workflow run id to compare'
-        type: string
-        required: false
-        default: ""
-
-
-# Used for `push` to easily modify the target workflow runs to compare against
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 env:
     prev_workflow_run_id: ""
     other_workflow_run_id: ""

@@ -5,13 +5,7 @@ name: Self-hosted runner scale set (AMD mi355 scheduled CI caller)
 #              2gpu : amd-mi355-ci-2gpu
  
 on:
-  workflow_run:
-    workflows: ["Self-hosted runner (AMD scheduled CI caller)"]
-    branches: ["main"]
-    types: [completed]
-  push:
-    branches:
-      - run_amd_scheduled_ci_caller*
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

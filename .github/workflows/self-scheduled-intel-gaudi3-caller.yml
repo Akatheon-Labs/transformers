@@ -1,10 +1,7 @@
 name: Self-hosted runner (Intel Gaudi3 scheduled CI caller)
 
 on:
-  repository_dispatch:
-  workflow_dispatch:
-  schedule:
-    - cron: "17 2 * * *"
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 permissions:
   contents: read

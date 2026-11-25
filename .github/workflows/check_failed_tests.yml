@@ -1,37 +1,7 @@
 name: Process failed tests
 
 on:
-  workflow_call:
-    inputs:
-      docker:
-        required: true
-        type: string
-      job:
-        required: true
-        type: string
-      slack_report_channel:
-        required: true
-        type: string
-      ci_event:
-        required: true
-        type: string
-      report_repo_id:
-        required: true
-        type: string
-      commit_sha:
-        required: false
-        type: string
-      pr_number:
-        required: false
-        type: string
-      max_num_runners:
-        required: false
-        type: number
-        default: 4
-    outputs:
-      is_check_failures_ok:
-        description: "Whether the failure checking infrastructure succeeded"
-        value: ${{ jobs.check_new_failures.result != 'failure' && jobs.process_new_failures_with_commit_info.result != 'failure' }}
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   HF_HOME: /mnt/cache

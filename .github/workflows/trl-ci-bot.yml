@@ -5,8 +5,7 @@
 name: TRL CI bot
 
 on:
-  issue_comment:
-    types: [created]
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 
 permissions: {}

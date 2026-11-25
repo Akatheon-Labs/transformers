@@ -1,10 +1,6 @@
 name: Release
 on:
-  push:
-    tags:
-      - v*
-    branches:
-      - 'v*-release'
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 
 permissions: {}

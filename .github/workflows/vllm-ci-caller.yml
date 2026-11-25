@@ -1,13 +1,7 @@
 name: vLLM Integration Tests
 
 on:
-  schedule:
-    # Run every night at 3 AM UTC
-    - cron: "0 3 * * *"
-  workflow_dispatch:
-  push:
-    branches:
-      - vllm_ci*
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   VLLM_TARGET_DEVICE: cpu

@@ -1,23 +1,7 @@
 name: Self-hosted runner (scheduled-intel-gaudi)
 
 on:
-  workflow_call:
-    inputs:
-      job:
-        required: true
-        type: string
-      slack_report_channel:
-        required: true
-        type: string
-      runner_scale_set:
-        required: true
-        type: string
-      ci_event:
-        required: true
-        type: string
-      report_repo_id:
-        required: true
-        type: string
+  workflow_dispatch: {}  # off on this showcase fork: upstream's CI runs upstream
 
 env:
   NUM_SLICES: 2

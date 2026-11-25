@@ -1,0 +1,39 @@
+# Keeps the showcase's saved certificates and testmon's database in GitHub's cache. GitHub deletes a cache entry no run
+# has read for 7 days, and a demo pull request without its base's certificates would run every test. Twice a week this
+# reads both for the base branch's commit (a restore counts as a read); when either is gone, it starts
+# akatheon-turbo-showcase-base.yml, which records them again.
+name: akatheon-turbo-showcase-keepwarm
+on:
+  schedule:
+    - cron: '0 6 * * 1,4'  # Mondays and Thursdays, 06:00 UTC
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write  # to start the base workflow when a cache entry is gone
+jobs:
+  keep-warm:
+    name: Keep the base's certificates in GitHub's cache
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/cache/restore@v4
+        id: certs
+        with:
+          path: .akatheon-ci/certs.json
+          key: akatheon-ci-certs-${{ github.sha }}
+      - uses: actions/cache/restore@v4
+        id: testmon
+        with:
+          path: ${{ runner.temp }}/testmon
+          key: testmon-${{ github.sha }}
+      - name: Record them again if either is gone
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CERTS: ${{ steps.certs.outputs.cache-hit }}
+          TESTMON: ${{ steps.testmon.outputs.cache-hit }}
+        run: |
+          echo "base ${GITHUB_SHA::10}: certificates ${CERTS:-missing}, testmon database ${TESTMON:-missing}" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$CERTS" != true ] || [ "$TESTMON" != true ]; then
+            gh workflow run akatheon-turbo-showcase-base.yml --ref "$GITHUB_REF_NAME" -R "$GITHUB_REPOSITORY"
+            echo "started akatheon-turbo-showcase-base.yml to record them again" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
